@@ -2,7 +2,17 @@
   import { tick } from "svelte";
   import type { Song } from "../lib/types";
 
-  let { songs, onselect }: { songs: Song[]; onselect: (s: Song) => void } = $props();
+  let {
+    songs,
+    onselect,
+    playlistName,
+    onclearplaylist,
+  }: {
+    songs: Song[];
+    onselect: (s: Song) => void;
+    playlistName?: string;
+    onclearplaylist?: () => void;
+  } = $props();
   let query = $state("");
   let cursor = $state(-1);
   let rowEls: (HTMLTableRowElement | null)[] = [];
@@ -37,6 +47,12 @@
   }
 </script>
 
+{#if playlistName}
+  <div class="pl-filter">
+    <span>Playlist: <strong>{playlistName}</strong></span>
+    <button class="pl-clear" onclick={onclearplaylist}>×</button>
+  </div>
+{/if}
 <input class="search" placeholder="Search by title or author…" bind:value={query} onkeydown={onkeydown} />
 
 <table>
@@ -61,5 +77,28 @@
   .highlighted {
     background: var(--accent) !important;
     color: var(--paper);
+  }
+
+  .pl-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .pl-clear {
+    border: none;
+    background: none;
+    padding: 0 0.2rem;
+    font-size: 1.1rem;
+    color: var(--muted);
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .pl-clear:hover {
+    color: var(--accent);
   }
 </style>

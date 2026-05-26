@@ -1,12 +1,20 @@
 <script lang="ts">
   import { frecency } from "../lib/frecency";
-  import type { History, Song } from "../lib/types";
+  import type { History, Playlist, Song } from "../lib/types";
 
   let {
     songs,
     history,
+    playlists,
     onselect,
-  }: { songs: Song[]; history: History[]; onselect: (s: Song) => void } = $props();
+    onplaylist,
+  }: {
+    songs: Song[];
+    history: History[];
+    playlists: Playlist[];
+    onselect: (s: Song) => void;
+    onplaylist: (pl: Playlist) => void;
+  } = $props();
 
   const byId = $derived(new Map(songs.map((s) => [s.id, s])));
 
@@ -26,6 +34,18 @@
 {#if songs.length === 0}
   <p class="empty">No tunes yet — use <em>Import</em> to add an iReal playlist.</p>
 {:else}
+  {#if playlists.length > 0}
+    <section class="playlists">
+      <h2>Playlists</h2>
+      <div class="pl-chips">
+        {#each playlists as pl (pl.id)}
+          <button onclick={() => onplaylist(pl)}>
+            {pl.name}<span class="chip">{pl.songIds.length}</span>
+          </button>
+        {/each}
+      </div>
+    </section>
+  {/if}
   <div class="columns">
     <section>
       <h2>Recent</h2>
