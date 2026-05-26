@@ -1,0 +1,3 @@
+[submodule "ireal-tokenizer"]
+	path = ireal-tokenizer
+	url = git@github.com:sbarbi-gh/ireal-tokenizer.git

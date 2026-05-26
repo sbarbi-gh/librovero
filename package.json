@@ -8,7 +8,7 @@
     "build": "svelte-check --tsconfig ./tsconfig.json && vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "build:wasm": "wasm-pack build ../../rust/ireal-tokenizer --target web --out-dir \"$(pwd)/src/lib/wasm\" -- --features wasm"
+    "build:wasm": "wasm-pack build ./ireal-tokenizer --target web --out-dir \"$(pwd)/src/lib/wasm\" -- --features wasm"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
