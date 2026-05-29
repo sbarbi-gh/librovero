@@ -117,40 +117,19 @@ function parseComment(raw: string): { above: boolean; text: string } {
 /** Lay out a token stream into positioned chart primitives. */
 export function layout(tokens: Token[]): ChartLayout {
   const els: ChartEl[] = [];
-  let cx = 0;
-  let cy = 0;
   let font = "l";
-  let newLine = false;
-
-  // At a line wrap, draw a leading barline at the start of the bar group.
-  const checkNewline = () => {
-    if (newLine) {
-      els.push({ kind: "barline", x: px(cx - (cx % 4)), y: py(cy), text: "𝄀" });
-    }
-    newLine = false;
-  };
+  let maxCy = 0;
 
   for (const tok of tokens) {
     if (isAtom(tok)) {
-      const [type, content] = tok;
+      const [type, content, cx, cy] = tok;
+      if (cy > maxCy) maxCy = cy;
       switch (type) {
-        case "xspace":
-          cx += parseInt(content, 10) || 0;
-          break;
-        case "yspace":
-          cy += parseInt(content, 10) || 0;
-          break;
         case "setfont":
           font = content;
           break;
         case "bar":
-          newLine = false;
           els.push({ kind: "barline", x: px(cx), y: py(cy), text: barGlyph(content) });
-          if (cx === 16) {
-            cx = 0;
-            cy++;
-            newLine = true;
-          }
           break;
         case "ending":
           els.push({
@@ -170,14 +149,11 @@ export function layout(tokens: Token[]): ChartLayout {
           }
           break;
         case "chrdspec":
-          checkNewline();
           els.push({ kind: "plain", x: px(cx), y: py(cy), cls: `chord special ${font}`, text: toMusic(content) });
-          cx++;
           break;
         case "rlb":
-          checkNewline();
-          cx++;
-          els.push({ kind: "plain", x: px(cx), y: py(cy), cls: "repeat", text: toMusic(content) });
+          // Render 1 cell right of logical position (visual centering in bar).
+          els.push({ kind: "plain", x: px(cx + 1), y: py(cy), cls: "repeat", text: toMusic(content) });
           break;
         case "comment": {
           const { above, text } = parseComment(content);
@@ -186,28 +162,25 @@ export function layout(tokens: Token[]): ChartLayout {
         }
       }
     } else if (isTimeSig(tok)) {
-      // Sit on the bar position, on the chord baseline (digits nudged just right
-      // of the barline via em offsets in the renderer).
-      els.push({ kind: "timesig", gx: px(cx), gy: py(cy), num: tok.numerator, den: tok.denominator });
+      if (tok.cy > maxCy) maxCy = tok.cy;
+      els.push({ kind: "timesig", gx: px(tok.cx), gy: py(tok.cy), num: tok.numerator, den: tok.denominator });
     } else if (isChord(tok)) {
-      checkNewline();
-      if (tok.optional) cx -= 1; // optional chords overlay near the previous one
+      if (tok.cy > maxCy) maxCy = tok.cy;
+      // cx already has cx -= 1 applied for optional chords (tokenizer semantic).
       els.push({
         kind: "chord",
-        x: px(cx + 0.4),
-        y: py(tok.optional ? cy - 0.5 : cy),
+        x: px(tok.cx + 0.4),
+        y: py(tok.optional ? tok.cy - 0.5 : tok.cy),
         cls: `chord ${font}${tok.optional ? " optional" : ""}`,
         parts: chordParts(tok),
       });
-      cx++;
     }
   }
 
-  const lines = cy;
   const offsetY = py(1.5);
   return {
     width: CELL.x * 18,
-    height: offsetY + py(lines) + py(2),
+    height: offsetY + py(maxCy) + py(2),
     offsetX: CELL.x,
     offsetY,
     elements: els,

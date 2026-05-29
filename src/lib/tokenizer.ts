@@ -3,7 +3,6 @@
 import init, {
   import_playlist_songs_wasm,
   import_song_wasm,
-  tokenize_flat,
   version,
 } from "./wasm/ireal_tokenizer.js";
 import type { ImportedPlaylist, ImportedSong } from "./types";
@@ -26,12 +25,6 @@ export async function importPlaylist(url: string): Promise<ImportedPlaylist> {
 export async function importSong(link: string): Promise<ImportedSong> {
   await initTokenizer();
   return JSON.parse(import_song_wasm(link)) as ImportedSong;
-}
-
-/** Tokenize raw iReal music into the flat token array. */
-export async function tokenizeFlat(music: string): Promise<[string, string][]> {
-  await initTokenizer();
-  return JSON.parse(tokenize_flat(music)) as [string, string][];
 }
 
 export async function tokenizerVersion(): Promise<string> {

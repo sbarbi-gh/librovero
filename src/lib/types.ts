@@ -1,7 +1,7 @@
 // Wire-format token types produced by the Rust tokenizer (structured/extended form).
-// Kept in sync with ../../rust/ireal-tokenizer/src/tokens.rs.
+// Kept in sync with ireal-tokenizer/src/tokens.rs.
 
-/** Structural-atom token type tags. */
+/** Structural-atom token type tags. XSpace and YSpace are consumed by the tokenizer. */
 export type AtomType =
   | "bar"
   | "rlb"
@@ -10,12 +10,10 @@ export type AtomType =
   | "annot"
   | "chrdspec"
   | "setfont"
-  | "comment"
-  | "xspace"
-  | "yspace";
+  | "comment";
 
-/** A structural atom: a `[type, content]` pair. */
-export type Atom = [AtomType, string];
+/** A structural atom: `[type, content, cx, cy]` — all atoms carry grid coordinates. */
+export type Atom = [AtomType, string, number, number];
 
 /** A chord — the one compound token. `note` is the root, or `"W"` for an invisible root. */
 export interface ChordToken {
@@ -26,6 +24,8 @@ export interface ChordToken {
   tensions?: string[];
   bass?: string;
   optional?: boolean;
+  cx: number;
+  cy: number;
 }
 
 /** A time-signature token. */
@@ -33,6 +33,8 @@ export interface TimeSigToken {
   type: "timesig";
   numerator: number;
   denominator: number;
+  cx: number;
+  cy: number;
 }
 
 export type Token = Atom | ChordToken | TimeSigToken;
