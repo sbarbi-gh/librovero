@@ -119,11 +119,17 @@ export function layout(tokens: Token[]): ChartLayout {
   const els: ChartEl[] = [];
   let font = "l";
   let maxCy = 0;
+  let lastCy = -1;
 
   for (const tok of tokens) {
     if (isAtom(tok)) {
       const [type, content, cx, cy] = tok;
       if (cy > maxCy) maxCy = cy;
+      // Add leading barline at start of row (except row 0) if first token is not a bar
+      if (cy > lastCy && cy > 0 && cx === 0 && type !== "bar") {
+        els.push({ kind: "barline", x: px(0), y: py(cy), text: "𝄀" });
+      }
+      lastCy = cy;
       switch (type) {
         case "setfont":
           font = content;
@@ -163,9 +169,19 @@ export function layout(tokens: Token[]): ChartLayout {
       }
     } else if (isTimeSig(tok)) {
       if (tok.cy > maxCy) maxCy = tok.cy;
+      // Add leading barline at start of row (except row 0) if first token is not a bar
+      if (tok.cy > lastCy && tok.cy > 0 && tok.cx === 0) {
+        els.push({ kind: "barline", x: px(0), y: py(tok.cy), text: "𝄀" });
+      }
+      lastCy = tok.cy;
       els.push({ kind: "timesig", gx: px(tok.cx), gy: py(tok.cy), num: tok.numerator, den: tok.denominator });
     } else if (isChord(tok)) {
       if (tok.cy > maxCy) maxCy = tok.cy;
+      // Add leading barline at start of row (except row 0) if first token is not a bar
+      if (tok.cy > lastCy && tok.cy > 0 && tok.cx === 0) {
+        els.push({ kind: "barline", x: px(0), y: py(tok.cy), text: "𝄀" });
+      }
+      lastCy = tok.cy;
       // cx already has cx -= 1 applied for optional chords (tokenizer semantic).
       els.push({
         kind: "chord",
