@@ -2,7 +2,7 @@
   import { layout } from "../lib/chart";
   import { getHistory, putHistory } from "../lib/db";
   import { rememberKey, touch } from "../lib/frecency";
-  import { MAJOR_KEYS, MINOR_KEYS, keyIsMinor, transpose } from "../lib/transpose";
+  import { MAJOR_KEYS, MINOR_KEYS, keyIsMinor, transpose, transposeAndFix } from "../lib/transpose";
   import type { Song } from "../lib/types";
 
   let {
@@ -33,7 +33,19 @@
 
   const isTransposed = $derived(currentKey !== "" && currentKey !== song.key);
   const keys = $derived(keyIsMinor(song.key) ? MINOR_KEYS : MAJOR_KEYS);
-  const chart = $derived(layout(transpose(song.tokens, song.key, currentKey || song.key)));
+
+  let chart = $state(layout([]));
+
+  $effect(() => {
+    const key = currentKey || song.key;
+    let cancelled = false;
+    transposeAndFix(song.tokens, song.key, key).then((tokens) => {
+      if (!cancelled) chart = layout(tokens);
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
 
   // Transposing remembers the key but does not count as a new open.
   async function setKey(k: string) {

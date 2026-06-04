@@ -1,5 +1,6 @@
 // Transposition over structured chord tokens.
 // Ported from the old app's transpose.mjs; operates on ChordToken note/bass.
+import { fixSpellings } from "./enharmonic";
 import { isChord, type ChordToken, type Token } from "./types";
 
 // Circle-of-fifths note spelling table (21 entries, Fb … B#).
@@ -49,4 +50,14 @@ export function transpose(tokens: Token[], origKey: string, newKey: string): Tok
   const by = transposeOffset(origKey, newKey);
   if (by === 0) return tokens;
   return tokens.map((t) => (isChord(t) ? transposeChord(t, by) : t));
+}
+
+/** Transpose and correct enharmonic spellings via the ONNX model. */
+export async function transposeAndFix(
+  tokens: Token[],
+  origKey: string,
+  newKey: string,
+): Promise<Token[]> {
+  const transposed = transpose(tokens, origKey, newKey);
+  return fixSpellings(transposed);
 }
