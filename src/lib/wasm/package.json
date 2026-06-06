@@ -1,0 +1,20 @@
+{
+  "name": "ireal-tokenizer",
+  "type": "module",
+  "collaborators": [
+    "Stefano"
+  ],
+  "description": "Canonical tokenizer for iReal Pro song format",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "ireal_tokenizer_bg.wasm",
+    "ireal_tokenizer.js",
+    "ireal_tokenizer.d.ts"
+  ],
+  "main": "ireal_tokenizer.js",
+  "types": "ireal_tokenizer.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
