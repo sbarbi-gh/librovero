@@ -93,8 +93,9 @@ let _sessionPromise: Promise<ort.InferenceSession> | null = null;
 
 function getSession(): Promise<ort.InferenceSession> {
   if (!_sessionPromise) {
-    // Use the WASM backend; multithreading not required for this tiny model.
     ort.env.wasm.numThreads = 1;
+    // WASM runtime files are staged to public/ort/ by the vite ortWasmPlugin.
+    ort.env.wasm.wasmPaths = "/ort/";
     _sessionPromise = ort.InferenceSession.create("/model/enharmonic.onnx", {
       executionProviders: ["wasm"],
     });

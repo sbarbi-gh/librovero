@@ -51,6 +51,10 @@ main {
   margin: 0 auto;
 }
 
+main.chart-open {
+  max-width: min(140rem, 98vw);
+}
+
 button {
   font: inherit;
   cursor: pointer;

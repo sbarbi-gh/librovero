@@ -34,7 +34,7 @@
   <span class="count">{songs.length} tunes</span>
 </header>
 
-<main>
+<main class:chart-open={!!selected}>
   {#if selected}
     <ChartView song={selected} onclose={() => (selected = null)} onopened={refresh} />
   {:else if view === "search"}

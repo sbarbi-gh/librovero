@@ -39,9 +39,11 @@
   $effect(() => {
     const key = currentKey || song.key;
     let cancelled = false;
-    transposeAndFix(song.tokens, song.key, key).then((tokens) => {
-      if (!cancelled) chart = layout(tokens);
-    });
+    transposeAndFix(song.tokens, song.key, key)
+      .catch(() => transpose(song.tokens, song.key, key))
+      .then((tokens) => {
+        if (!cancelled) chart = layout(tokens);
+      });
     return () => {
       cancelled = true;
     };
@@ -80,8 +82,6 @@
     class="chart"
     role="img"
     aria-label={`${song.title} chart`}
-    width={chart.width}
-    height={chart.height}
     viewBox={`0 0 ${chart.width} ${chart.height}`}
   >
     <g transform={`translate(${chart.offsetX},${chart.offsetY})`}>
@@ -128,6 +128,8 @@
     font-family: "Patrick Hand", cursive;
     font-size: 20px;
     fill: var(--ink);
+    width: 100%;
+    height: auto;
   }
 
   /* Dynamic classes are applied via string props, so scope them under .chart
