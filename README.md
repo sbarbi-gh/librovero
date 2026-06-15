@@ -59,8 +59,3 @@ src/
 ireal-tokenizer/   Rust tokenizer crate (git submodule)
 ```
 
-## Status
-
-Phases 1–5 done: canonical Rust tokenizer, scaffold, import flow, SVG chart
-(`layout()` + `ChartView`, ported from the old `draw.mjs`), and search/history with
-frecency ranking.
