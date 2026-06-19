@@ -9,6 +9,8 @@ fine-tuned ChordBERT ONNX model selects the musically-appropriate spelling (e.g.
 Bb not A# in a Bb-major context); see the sibling [`ireal-model`](../ireal-model)
 project.
 
+![E=Fb](images/einstein.jpeg)
+
 ## Stack
 
 - **Vite + Svelte 5 (runes) + TypeScript**
@@ -64,5 +66,6 @@ src/
   App.svelte, main.ts
 ireal-tokenizer/   Rust tokenizer crate (git submodule)
 public/model/     enharmonic.onnx (fine-tuned ChordBERT for spelling correction)
+images/           E=Fb meme
 ```
 
