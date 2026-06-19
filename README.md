@@ -6,8 +6,7 @@ view tunes, with recent/most-played ranking. Charts are tokenized by the Rust
 WebAssembly; it is vendored here as a git submodule at `ireal-tokenizer/`.
 Transposition is **enharmonically correct** — after mechanical pitch shifting a
 fine-tuned ChordBERT ONNX model selects the musically-appropriate spelling (e.g.
-Bb not A# in a Bb-major context); see the sibling [`ireal-model`](../ireal-model)
-project.
+Bb not A# in a Bb-major context).
 
 ![E=Fb](images/einstein.jpeg)
 
