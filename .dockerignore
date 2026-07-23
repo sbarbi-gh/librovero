@@ -1,4 +1,7 @@
 node_modules
 dist
+.git
+.gitmodules
+ireal-tokenizer
 .DS_Store
 *.local
