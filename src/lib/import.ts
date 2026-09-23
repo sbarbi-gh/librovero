@@ -22,10 +22,21 @@ export async function importSingleSong(url: string): Promise<Song> {
   return toSong(await importSong(url));
 }
 
+/** Playlist URLs separate songs from the playlist title with `===`. */
+export function isSingleSongUrl(url: string): boolean {
+  return url.startsWith("irealb://") && !decodeURIComponent(url).includes("===");
+}
+
 export async function addSongToPlaylist(song: Song, playlist: Playlist): Promise<void> {
+  const storedPlaylist: Playlist = {
+    id: playlist.id,
+    name: playlist.name,
+    importedAt: playlist.importedAt,
+    songIds: [...playlist.songIds],
+  };
   await putSongs([song]);
-  if (!playlist.songIds.includes(song.id)) {
-    await putPlaylist({ ...playlist, songIds: [...playlist.songIds, song.id] });
+  if (!storedPlaylist.songIds.includes(song.id)) {
+    await putPlaylist({ ...storedPlaylist, songIds: [...storedPlaylist.songIds, song.id] });
   }
 }
 

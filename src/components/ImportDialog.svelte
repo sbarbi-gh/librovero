@@ -5,6 +5,7 @@
     extractIrealUrl,
     importPlaylistUrl,
     importSingleSong,
+    isSingleSongUrl,
   } from "../lib/import";
   import type { Playlist, Song } from "../lib/types";
 
@@ -21,7 +22,7 @@
   let text = $state("");
   let status = $state("");
   let busy = $state(false);
-  let song = $state<Song | null>(null);
+  let song = $state.raw<Song | null>(null);
   let playlistId = $state("");
   let newPlaylistName = $state("");
 
@@ -29,24 +30,13 @@
     busy = true;
     status = "Importing…";
     try {
-      try {
+      if (isSingleSongUrl(url)) {
+        song = await importSingleSong(url);
+        status = `Choose a playlist for “${song.title}”.`;
+      } else {
         const { playlist, count } = await importPlaylistUrl(url);
         status = `Imported ${count} tunes from “${playlist.name}”.`;
         onimported();
-      } catch (playlistError) {
-        try {
-          song = await importSingleSong(url);
-          status = `Choose a playlist for “${song.title}”.`;
-        } catch (songError) {
-          if (
-            playlistError instanceof Error &&
-            !playlistError.message.includes("does not contain any tunes")
-          ) {
-            throw playlistError;
-          }
-          if (songError instanceof Error) throw songError;
-          throw playlistError;
-        }
       }
     } catch (e) {
       status = "Failed: " + (e as Error).message;
@@ -56,7 +46,8 @@
   }
 
   async function saveSingleSong() {
-    if (!song) return;
+    const importedSong = song;
+    if (!importedSong) return;
     const existingPlaylist = playlists.find((playlist) => playlist.id === playlistId);
     const name = newPlaylistName.trim();
     if (!existingPlaylist && !name) {
@@ -67,11 +58,11 @@
     busy = true;
     try {
       if (existingPlaylist) {
-        await addSongToPlaylist(song, existingPlaylist);
-        status = `Added “${song.title}” to “${existingPlaylist.name}”.`;
+        await addSongToPlaylist(importedSong, existingPlaylist);
+        status = `Added “${importedSong.title}” to “${existingPlaylist.name}”.`;
       } else {
-        const playlist = await createPlaylistWithSong(name, song);
-        status = `Added “${song.title}” to new playlist “${playlist.name}”.`;
+        const playlist = await createPlaylistWithSong(name, importedSong);
+        status = `Added “${importedSong.title}” to new playlist “${playlist.name}”.`;
       }
       onimported();
     } catch (e) {
