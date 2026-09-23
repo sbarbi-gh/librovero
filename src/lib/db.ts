@@ -61,6 +61,28 @@ export async function putPlaylist(pl: Playlist): Promise<void> {
   await (await db()).put("playlists", pl);
 }
 
+export async function deletePlaylist(id: string): Promise<void> {
+  const d = await db();
+  const playlist = await d.get("playlists", id);
+  if (!playlist) return;
+
+  const otherPlaylists = await d.getAll("playlists");
+  const retainedSongIds = new Set(
+    otherPlaylists
+      .filter((other) => other.id !== id)
+      .flatMap((other) => other.songIds),
+  );
+  const orphanedSongIds = playlist.songIds.filter((songId) => !retainedSongIds.has(songId));
+
+  const tx = d.transaction(["playlists", "songs", "history"], "readwrite");
+  await tx.objectStore("playlists").delete(id);
+  for (const songId of orphanedSongIds) {
+    await tx.objectStore("songs").delete(songId);
+    await tx.objectStore("history").delete(songId);
+  }
+  await tx.done;
+}
+
 export async function allPlaylists(): Promise<Playlist[]> {
   return (await db()).getAll("playlists");
 }

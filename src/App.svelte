@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { allHistory, allPlaylists, allSongs } from "./lib/db";
+  import { allHistory, allPlaylists, allSongs, deletePlaylist } from "./lib/db";
   import type { History, Playlist, Song } from "./lib/types";
   import ChartView from "./components/ChartView.svelte";
   import Home from "./components/Home.svelte";
@@ -21,6 +21,13 @@
 
   async function refresh() {
     [songs, history, playlists] = await Promise.all([allSongs(), allHistory(), allPlaylists()]);
+  }
+
+  async function removePlaylist(playlist: Playlist) {
+    if (!confirm(`Delete the playlist “${playlist.name}”?`)) return;
+    await deletePlaylist(playlist.id);
+    if (activePlaylist?.id === playlist.id) activePlaylist = null;
+    await refresh();
   }
 
   onMount(refresh);
@@ -51,6 +58,7 @@
       {playlists}
       onselect={(s) => (selected = s)}
       onplaylist={(pl) => { activePlaylist = pl; selected = null; view = "search"; }}
+      ondeleteplaylist={removePlaylist}
     />
   {/if}
 </main>

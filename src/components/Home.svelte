@@ -8,12 +8,14 @@
     playlists,
     onselect,
     onplaylist,
+    ondeleteplaylist,
   }: {
     songs: Song[];
     history: History[];
     playlists: Playlist[];
     onselect: (s: Song) => void;
     onplaylist: (pl: Playlist) => void;
+    ondeleteplaylist: (pl: Playlist) => void;
   } = $props();
 
   const byId = $derived(new Map(songs.map((s) => [s.id, s])));
@@ -39,9 +41,19 @@
       <h2>Playlists</h2>
       <div class="pl-chips">
         {#each playlists as pl (pl.id)}
-          <button onclick={() => onplaylist(pl)}>
-            {pl.name}<span class="chip">{pl.songIds.length}</span>
-          </button>
+          <div class="playlist-chip">
+            <button onclick={() => onplaylist(pl)}>
+              {pl.name}<span class="chip">{pl.songIds.length}</span>
+            </button>
+            <button
+              class="delete-playlist"
+              aria-label={`Delete playlist ${pl.name}`}
+              title={`Delete ${pl.name}`}
+              onclick={() => ondeleteplaylist(pl)}
+            >
+              Delete
+            </button>
+          </div>
         {/each}
       </div>
     </section>

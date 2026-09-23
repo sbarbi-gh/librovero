@@ -100,10 +100,26 @@ h2 {
   gap: 0.4rem;
 }
 
-.pl-chips button {
+.playlist-chip {
+  display: flex;
+}
+
+.playlist-chip button:first-child {
   display: flex;
   align-items: center;
   gap: 0.3rem;
+  border-radius: 5px 0 0 5px;
+}
+
+.playlist-chip .delete-playlist {
+  border-left: 0;
+  border-radius: 0 5px 5px 0;
+  color: var(--muted);
+  padding-inline: 0.45rem;
+}
+
+.playlist-chip .delete-playlist:hover {
+  color: var(--accent);
 }
 
 /* Home */

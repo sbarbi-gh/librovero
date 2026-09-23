@@ -85,6 +85,9 @@ async function importIrealbookUrl(
   }
 
   const songs = imported.map(toSong);
+  if (songs.length === 0) {
+    throw new Error("This playlist does not contain any valid tunes.");
+  }
   await putSongs(songs);
 
   const playlist: Playlist = {
@@ -105,6 +108,9 @@ export async function importPlaylistUrl(
 
   const parsed = await importPlaylist(url);
   const songs: Song[] = parsed.songs.map(toSong);
+  if (songs.length === 0) {
+    throw new Error("This playlist does not contain any tunes.");
+  }
   await putSongs(songs);
 
   const playlist: Playlist = {
