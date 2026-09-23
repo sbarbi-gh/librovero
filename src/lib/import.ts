@@ -1,4 +1,4 @@
-// Import orchestration: wasm-parse an irealb:// or irealbook:// URL, dedup, persist to IndexedDB.
+// Import orchestration: wasm-parse iReal URLs, dedup, persist to IndexedDB.
 import { putPlaylist, putSongs, songId } from "./db";
 import { importPlaylist, importSong } from "./tokenizer";
 import type { ImportedSong, Playlist, Song } from "./types";
@@ -16,6 +16,29 @@ function toSong(s: ImportedSong): Song {
     compStyle: s.comp_style,
     tempo: s.tempo,
   };
+}
+
+export async function importSingleSong(url: string): Promise<Song> {
+  return toSong(await importSong(url));
+}
+
+export async function addSongToPlaylist(song: Song, playlist: Playlist): Promise<void> {
+  await putSongs([song]);
+  if (!playlist.songIds.includes(song.id)) {
+    await putPlaylist({ ...playlist, songIds: [...playlist.songIds, song.id] });
+  }
+}
+
+export async function createPlaylistWithSong(name: string, song: Song): Promise<Playlist> {
+  const playlist: Playlist = {
+    id: songId(name, String(Date.now())),
+    name,
+    importedAt: Date.now(),
+    songIds: [song.id],
+  };
+  await putSongs([song]);
+  await putPlaylist(playlist);
+  return playlist;
 }
 
 // ── irealbook:// support ──────────────────────────────────────────────────────

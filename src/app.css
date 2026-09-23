@@ -244,11 +244,33 @@ th {
   width: min(32rem, 90vw);
 }
 
-.dialog textarea {
+.dialog textarea,
+.dialog input,
+.dialog select {
   width: 100%;
   font-family: monospace;
   border: 1px solid var(--border);
   border-radius: 4px;
+  padding: 0.4rem;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.dialog label {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+.dialog label input,
+.dialog label select {
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.dialog .or {
+  margin: 0.5rem 0;
+  color: var(--muted);
+  text-align: center;
 }
 
 .dialog .row {

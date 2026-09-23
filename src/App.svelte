@@ -65,6 +65,7 @@
 
 {#if importing}
   <ImportDialog
+    {playlists}
     onclose={() => (importing = false)}
     onimported={async () => { importing = false; await refresh(); }}
   />
